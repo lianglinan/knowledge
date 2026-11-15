@@ -350,27 +350,34 @@ function dmeta(k){
 
 const PER_DAY = 8;
 
-function hashKey(s){
-  let h = 0;
-  for(let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) % 100000;
-  return h;
+/* 把所有领域的条目按「领域轮询」拍平：
+   金融0, 科技0, …, 语言0, 金融1, 科技1, …
+   这样任意连续的 PER_DAY 个元素必然来自不同领域，
+   且游标每次前进 PER_DAY，整池轮完才会重复——不会跳步、不会提前撞车。 */
+let FLAT = null;
+
+function buildFlat(){
+  FLAT = [];
+  if(!DKEYS.length) return;
+  const maxLen = Math.max.apply(null, DKEYS.map(k => dmeta(k).items.length));
+  for(let i = 0; i < maxLen; i++){
+    for(let j = 0; j < DKEYS.length; j++){
+      const it = dmeta(DKEYS[j]).items[i];
+      if(it) FLAT.push({ domain: DKEYS[j], item: it });
+    }
+  }
 }
 
-/* 每天：按日期轮转挑选 8 个领域，每个领域按 hash + 日期步进挑一条 */
 function digestFor(dayN, offset, filter){
+  if(FLAT === null) buildFlat();
+  if(!FLAT.length) return [];
+  const n = FLAT.length;
+  const startIdx = (((dayN + offset * 7) * PER_DAY) % n + n) % n;
   const out = [];
-  const n = DKEYS.length;
-  if(!n) return out;
-  const count = Math.min(PER_DAY, n);
-  const start = ((dayN + offset) % n + n) % n;
-  for(let i=0;i<count;i++){
-    const key = DKEYS[(start + i) % n];
-    if(filter && filter !== 'all' && key !== filter) continue;
-    const pool = dmeta(key).items;
-    if(!pool.length) continue;
-    const step = (dayN + offset) * 7 + hashKey(key);
-    const idx = ((step % pool.length) + pool.length) % pool.length;
-    out.push({ domain:key, item:pool[idx] });
+  for(let i = 0; i < PER_DAY; i++){
+    const x = FLAT[(startIdx + i) % n];
+    if(filter && filter !== 'all' && x.domain !== filter) continue;
+    out.push(x);
   }
   return out;
 }

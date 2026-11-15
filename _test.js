@@ -48,7 +48,7 @@ const tests = `
   const day = 20000;
 
   /* ---- 内容池 ---- */
-  ok('领域数为 10', DKEYS.length === 10, DKEYS.join('/'));
+  ok('领域数为 26', DKEYS.length === 26, DKEYS.length + ': ' + DKEYS.join('/'));
 
   let badField = [];
   DKEYS.forEach(k => {
@@ -64,7 +64,7 @@ const tests = `
   ok('每条字段完整（4 字段 + 3 输入 + 3 自测）', badField.length === 0, badField.slice(0,6).join(','));
 
   const total = DKEYS.reduce((s,k) => s + dmeta(k).items.length, 0);
-  ok('总条目 >= 60', total >= 60, 'got ' + total);
+  ok('总条目 >= 156', total >= 156, 'got ' + total);
 
   const titles = [];
   DKEYS.forEach(k => dmeta(k).items.forEach(it => titles.push(it.t)));
@@ -89,18 +89,18 @@ const tests = `
 
   const seen = new Set();
   for (let n = 0; n < 30; n++) digestFor(day + n, 0, 'all').forEach(x => seen.add(x.domain));
-  ok('30 天内覆盖全部 10 个领域', seen.size === 10, [...seen].join('/'));
+  ok('30 天内覆盖全部领域', seen.size === DKEYS.length, seen.size + '/' + DKEYS.length);
 
-  // 每个领域的条目池要被轮完
-  let rotBad = [];
-  DKEYS.forEach(k => {
-    const got = new Set();
-    for (let n = 0; n < 40; n++) {
-      digestFor(day + n, 0, 'all').forEach(x => { if (x.domain === k) got.add(x.item.t); });
-    }
-    if (got.size !== dmeta(k).items.length) rotBad.push(k + ':' + got.size + '/' + dmeta(k).items.length);
-  });
-  ok('40 天内每个领域条目轮换完整', rotBad.length === 0, rotBad.join(','));
+  // 整池轮完之前不应出现重复条目
+  const shown = [];
+  const fullDays = Math.floor(total / 8);
+  for (let n = 0; n < fullDays; n++) digestFor(day + n, 0, 'all').forEach(x => shown.push(x.item.t));
+  const dupShown = shown.filter((t,n) => shown.indexOf(t) !== n);
+  ok('轮完一遍前无重复（' + fullDays + ' 天）', dupShown.length === 0, dupShown.slice(0,3).join(' | '));
+
+  const allShown = new Set();
+  for (let n = 0; n < fullDays + 1; n++) digestFor(day + n, 0, 'all').forEach(x => allShown.add(x.item.t));
+  ok('轮完后全部条目都出现过', allShown.size === total, allShown.size + '/' + total);
 
   ok('按领域筛选只返回该领域', (function(){
     const f = digestFor(day, 0, '金融');
@@ -111,7 +111,7 @@ const tests = `
 
   /* ---- 渲染 ---- */
   renderChips();
-  ok('筛选条渲染出 11 个 chip', (document.getElementById('chips').innerHTML.match(/class="chip/g)||[]).length === 11);
+  ok('筛选条渲染出 ' + (DKEYS.length+1) + ' 个 chip', (document.getElementById('chips').innerHTML.match(/class="chip/g)||[]).length === DKEYS.length + 1);
   renderToday();
   const body = document.getElementById('todayBody').innerHTML;
   ok('今日渲染出 8 个条目', (body.match(/class="item /g)||[]).length === 8, 'got ' + (body.match(/class="item /g)||[]).length);
@@ -177,7 +177,7 @@ const tests = `
   /* ---- 其他 ---- */
   ok('HTML 转义', esc('<script>&"') === '&lt;script&gt;&amp;&quot;');
   renderCorpus();
-  ok('内容规模统计正常', document.getElementById('corpusInfo').innerHTML.includes('10 个领域'));
+  ok('内容规模统计正常', document.getElementById('corpusInfo').innerHTML.includes(DKEYS.length + ' 个领域'));
 
   global.__R = R;
 })();
