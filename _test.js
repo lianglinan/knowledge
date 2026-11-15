@@ -53,7 +53,7 @@ const tests = `
   let badField = [];
   DKEYS.forEach(k => {
     const items = dmeta(k).items;
-    if (items.length < 6) badField.push(k + ':only ' + items.length);
+    if (items.length < 8) badField.push(k + ':only ' + items.length);
     items.forEach((it, n) => {
       if (!it.t || !it.h) badField.push(k + '[' + n + ']:basic');
       if (!Array.isArray(it.r) || it.r.length !== 3) badField.push(k + '[' + n + ']:r');
@@ -64,7 +64,9 @@ const tests = `
   ok('每条字段完整（4 字段 + 3 输入 + 3 自测）', badField.length === 0, badField.slice(0,6).join(','));
 
   const total = DKEYS.reduce((s,k) => s + dmeta(k).items.length, 0);
-  ok('总条目 >= 156', total >= 156, 'got ' + total);
+  ok('总条目 >= 208', total >= 208, 'got ' + total);
+  ok('每个领域条数一致（8 条）', DKEYS.every(k => dmeta(k).items.length === 8),
+     DKEYS.map(k => dmeta(k).items.length).join(','));
 
   const titles = [];
   DKEYS.forEach(k => dmeta(k).items.forEach(it => titles.push(it.t)));
