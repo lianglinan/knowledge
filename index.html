@@ -22,41 +22,64 @@
   }
   .wrap{max-width:680px;margin:0 auto;padding:0 16px}
   header{
-    position:sticky;top:0;z-index:20;background:rgba(14,17,22,.92);
+    position:sticky;top:0;z-index:20;background:rgba(14,17,22,.94);
     backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
-    padding:14px 0 10px;
+    padding:12px 0 10px;
   }
-  .hd-inner{max-width:680px;margin:0 auto;padding:0 16px;display:flex;align-items:baseline;gap:10px}
-  .hd-date{font-size:13px;color:var(--dim);letter-spacing:.02em}
-  .hd-track{
-    font-size:12px;padding:2px 9px;border-radius:999px;
-    background:rgba(77,163,255,.14);color:var(--accent);border:1px solid rgba(77,163,255,.3)
-  }
-  main{padding-top:18px}
+  .hd-inner{max-width:680px;margin:0 auto;padding:0 16px}
+  .hd-top{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .hd-date{font-size:14px;color:var(--fg);font-weight:600}
+  .hd-count{font-size:12px;color:var(--dim)}
+  .hbar{height:3px;background:var(--card2);border-radius:999px;margin-top:9px;overflow:hidden}
+  .hbar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#4da3ff,#7ee787);border-radius:999px;transition:width .3s}
+  main{padding-top:16px}
   .view{display:none}
   .view.on{display:block}
 
-  h1{font-size:24px;line-height:1.35;margin:4px 0 8px;font-weight:650;letter-spacing:-.01em}
-  .hook{color:var(--dim);font-size:15px;margin-bottom:22px}
+  /* 领域筛选 */
+  .chips{display:flex;gap:7px;overflow-x:auto;padding-bottom:10px;margin-bottom:6px;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;font:inherit;font-size:13px;padding:5px 12px;border-radius:999px;
+    background:var(--card);border:1px solid var(--line);color:var(--dim);
+    cursor:pointer;white-space:nowrap;font-family:inherit
+  }
+  .chip.on{background:rgba(77,163,255,.15);border-color:rgba(77,163,255,.5);color:var(--accent)}
 
-  .sec{margin-bottom:24px}
+  /* 每日条目 */
+  .item{
+    background:var(--card);border:1px solid var(--line);border-radius:14px;
+    margin-bottom:10px;overflow:hidden;transition:border-color .15s
+  }
+  .item.open{border-color:#3a4655}
+  .item-hd{padding:13px 15px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+  .item-hd .dot{flex:0 0 8px;width:8px;height:8px;border-radius:999px;margin-top:8px}
+  .item-hd .txt{flex:1;min-width:0}
+  .item-hd .dname{font-size:11px;letter-spacing:.08em;color:var(--dim);display:block;margin-bottom:2px}
+  .item-hd .ttl{font-size:15.5px;font-weight:600;line-height:1.45;display:block}
+  .item-hd .hook{font-size:13.5px;color:var(--dim);margin-top:4px;line-height:1.55}
+  .item-hd .chev{flex:0 0 auto;color:var(--dim);font-size:12px;margin-top:3px;transition:.2s}
+  .item.open .chev{transform:rotate(90deg)}
+  .item.read .ttl{color:#9fb0c2}
+  .item.read .dot{opacity:.35}
+  .item-bd{padding:0 15px 14px;border-top:1px solid var(--line);margin-top:2px}
+  .item-bd .sec{margin-top:14px}
   .sec-t{
-    font-size:12px;color:var(--dim);letter-spacing:.12em;text-transform:uppercase;
-    margin-bottom:10px;display:flex;align-items:center;gap:8px
+    font-size:11px;color:var(--dim);letter-spacing:.1em;margin-bottom:7px;
+    display:flex;align-items:center;gap:8px
   }
   .sec-t::after{content:"";flex:1;height:1px;background:var(--line)}
-
   ul.reads{margin:0;padding:0;list-style:none}
-  ul.reads li{
-    background:var(--card);border:1px solid var(--line);border-radius:12px;
-    padding:12px 14px;margin-bottom:8px;font-size:15px;color:#d5dee8
-  }
-  ol.quiz{margin:0;padding-left:20px}
-  ol.quiz li{margin-bottom:10px;font-size:15px;color:#d5dee8}
+  ul.reads li{font-size:14.5px;color:#d5dee8;padding:7px 0 7px 14px;position:relative;border-bottom:1px solid rgba(42,50,61,.5)}
+  ul.reads li:last-child{border-bottom:0}
+  ul.reads li::before{content:"›";position:absolute;left:2px;color:var(--dim)}
+  ol.quiz{margin:0;padding-left:18px}
+  ol.quiz li{font-size:14.5px;color:#d5dee8;margin-bottom:7px}
   .link-note{
-    background:rgba(126,231,135,.07);border:1px solid rgba(126,231,135,.25);
-    border-radius:12px;padding:12px 14px;font-size:14px;color:#c8e6cd
+    background:rgba(126,231,135,.07);border:1px solid rgba(126,231,135,.22);
+    border-radius:10px;padding:10px 12px;font-size:13.5px;color:#c8e6cd;line-height:1.6
   }
+  .item-foot{display:flex;gap:8px;margin-top:16px}
 
   .btn{
     display:inline-flex;align-items:center;justify-content:center;gap:6px;
@@ -68,16 +91,14 @@
   .btn.primary{background:var(--accent);border-color:var(--accent);color:#06121f;font-weight:600}
   .btn.ok{background:rgba(126,231,135,.15);border-color:rgba(126,231,135,.45);color:var(--ok)}
   .btn.bad{background:rgba(255,123,114,.13);border-color:rgba(255,123,114,.4);color:var(--bad)}
-  .btn.sm{padding:7px 12px;font-size:13px;min-height:36px}
+  .btn.sm{padding:7px 13px;font-size:13.5px;min-height:38px}
+  .btn.done{background:rgba(126,231,135,.12);border-color:rgba(126,231,135,.35);color:var(--ok)}
   .row{display:flex;gap:8px;flex-wrap:wrap}
 
-  .cardtile{
-    background:var(--card);border:1px solid var(--line);border-radius:14px;
-    padding:14px 16px;margin-bottom:10px
-  }
+  .cardtile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
   .cardtile h3{margin:0 0 6px;font-size:16px;font-weight:600}
   .cardtile .ex{color:var(--dim);font-size:14px;margin:0 0 8px}
-  .meta{display:flex;gap:10px;font-size:12px;color:var(--dim);flex-wrap:wrap}
+  .meta{display:flex;gap:10px;font-size:12px;color:var(--dim);flex-wrap:wrap;align-items:center}
   .pill{padding:1px 8px;border-radius:999px;background:var(--card2);border:1px solid var(--line)}
   .pill.due{background:rgba(227,179,65,.15);border-color:rgba(227,179,65,.4);color:var(--warn)}
 
@@ -91,49 +112,25 @@
   .field textarea{resize:vertical;min-height:64px}
 
   .empty{color:var(--dim);text-align:center;padding:44px 16px;font-size:15px}
+  .empty b{color:var(--fg)}
 
-  /* 复习翻面 */
-  .flip{
-    background:var(--card);border:1px solid var(--line);border-radius:16px;
-    padding:22px 18px;margin-bottom:16px;min-height:180px;display:flex;
-    flex-direction:column;justify-content:center
-  }
+  .flip{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 18px;margin-bottom:16px;min-height:180px;display:flex;flex-direction:column;justify-content:center}
   .flip .q{font-size:20px;font-weight:600;line-height:1.4}
   .flip .a{margin-top:16px;padding-top:16px;border-top:1px dashed var(--line);font-size:15px;color:#d5dee8}
   .flip .a .lbl{color:var(--dim);font-size:12px;letter-spacing:.08em;display:block;margin-bottom:3px}
   .progress{font-size:12px;color:var(--dim);text-align:center;margin-bottom:14px}
 
-  nav{
-    position:fixed;left:0;right:0;bottom:0;z-index:30;
-    background:rgba(14,17,22,.96);backdrop-filter:blur(14px);
-    border-top:1px solid var(--line);
-    padding-bottom:env(safe-area-inset-bottom);
-  }
+  nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(14,17,22,.97);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
   .nav-inner{max-width:680px;margin:0 auto;display:flex}
-  nav button{
-    flex:1;background:none;border:0;color:var(--dim);font:inherit;font-size:11px;
-    padding:9px 0 10px;cursor:pointer;display:flex;flex-direction:column;
-    align-items:center;gap:3px;font-family:inherit
-  }
+  nav button{flex:1;background:none;border:0;color:var(--dim);font:inherit;font-size:11px;padding:9px 0 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-family:inherit;position:relative}
   nav button .ic{font-size:19px;line-height:1}
   nav button.on{color:var(--accent)}
-  nav button .badge{
-    position:absolute;transform:translate(16px,-6px);background:var(--warn);color:#1a1200;
-    font-size:10px;font-weight:700;border-radius:999px;padding:0 5px;min-width:16px;line-height:16px
-  }
+  nav button .badge{position:absolute;transform:translate(16px,-6px);background:var(--warn);color:#1a1200;font-size:10px;font-weight:700;border-radius:999px;padding:0 5px;min-width:16px;line-height:16px}
 
-  .toast{
-    position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));
-    transform:translateX(-50%) translateY(10px);
-    background:#2a323d;color:var(--fg);padding:10px 18px;border-radius:999px;
-    font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap
-  }
+  .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:#2a323d;color:var(--fg);padding:10px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .warnbar{
-    background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.35);
-    color:var(--warn);font-size:13px;padding:9px 12px;border-radius:10px;margin-bottom:14px
-  }
-  .note{font-size:13px;color:var(--dim);line-height:1.7}
+  .warnbar{background:rgba(227,179,65,.1);border:1px solid rgba(227,179,65,.35);color:var(--warn);font-size:13px;padding:9px 12px;border-radius:10px;margin-bottom:14px}
+  .note{font-size:13px;color:var(--dim);line-height:1.75}
   .note b{color:#c8d2de;font-weight:600}
 </style>
 </head>
@@ -141,23 +138,25 @@
 
 <header>
   <div class="hd-inner">
-    <span class="hd-date" id="hdDate"></span>
-    <span class="hd-track" id="hdTrack"></span>
+    <div class="hd-top">
+      <span class="hd-date" id="hdDate">—</span>
+      <span class="hd-count" id="hdCount"></span>
+    </div>
+    <div class="hbar"><i id="hbarFill"></i></div>
   </div>
 </header>
 
 <main class="wrap">
 
-  <!-- 今日 -->
   <section class="view on" id="v-today">
+    <div class="chips" id="chips"></div>
     <div id="todayBody"></div>
-    <div class="row" style="margin-top:6px">
-      <button class="btn sm" onclick="spinToday()">换一个 ↻</button>
+    <div class="row" style="margin-top:8px">
+      <button class="btn sm" onclick="spinToday()">换一批 ↻</button>
       <button class="btn sm" onclick="go('cards')">记一张卡 →</button>
     </div>
   </section>
 
-  <!-- 卡片 -->
   <section class="view" id="v-cards">
     <div class="row" style="margin-bottom:16px">
       <button class="btn primary sm" onclick="toggleForm()" id="formBtn">+ 新卡片</button>
@@ -190,22 +189,25 @@
     <div id="cardList"></div>
   </section>
 
-  <!-- 复习 -->
   <section class="view" id="v-review">
     <div id="reviewBody"></div>
   </section>
 
-  <!-- 更多 -->
   <section class="view" id="v-more">
     <div class="sec">
       <div class="sec-t">怎么用</div>
       <div class="note">
-        <b>每天 25–35 分钟。</b><br>
-        1. 输入 15 分钟：只读「输入方向」里的一个，读完再动笔。<br>
-        2. 输出 10 分钟：合上材料，去「卡片」写一张。写不出就是没懂，回去补。<br>
-        3. 复习 5 分钟：把「复习」里的卡过一遍，讲得出来才算过。<br><br>
+        <b>每天一组，8 条，来自 8 个不同领域。</b><br>
+        进来看一条、读一条、标一条已读，随时退出都行，进度会留着。<br><br>
+        读到有感觉的，去「卡片」用自己的话写一张。写不出来就是没懂，回去补。<br>
+        「复习」里到期的卡，讲得出来才算过。<br><br>
         <b>衡量标准不是读了几篇，是：</b>能讲清几个概念、卡片之间多了几条连线、有没有一次真用上。
       </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-t">内容规模</div>
+      <div class="note" id="corpusInfo"></div>
     </div>
 
     <div class="sec">
@@ -217,16 +219,15 @@
         <input type="file" id="imp" accept=".json" style="display:none" onchange="importJSON(event)">
       </div>
       <div class="note" style="margin-top:10px">
-        卡片存在这台手机的浏览器里（localStorage）。换机或清缓存前先「导出备份」。<br>
-        导出 Markdown 可以直接丢进 Obsidian / flomo / 备忘录。
+        卡片和阅读进度都存在这台手机的浏览器里（localStorage）。换机或清缓存前先「导出备份」。
       </div>
     </div>
 
     <div class="sec">
       <div class="sec-t">关于「随时推荐」</div>
       <div class="note">
-        这个页面内置了 <span id="dayCount">24</span> 天的内容，<b>每天按日期自动换</b>，不需要联网，也不需要等谁在线。<br><br>
-        想加新的一批（比如下个月的方向、或者你最近在啃的 Redis/Pulsar），在会话里说一句「补 10 天，重点放在 X」，我把内容追加进来，你重新保存一下这个文件就行。
+        页面按日期自动组合每天的内容，<b>不联网、不等谁在线</b>。<br><br>
+        要加新内容，改 <code>data.js</code> 里的条目池就行；也可以在会话里说「补一批 X 方向的」，我写好你推送一次。
       </div>
     </div>
 
@@ -249,424 +250,11 @@
 
 <div class="toast" id="toast"></div>
 
+<script src="data.js"></script>
 <script>
-/* ============ 内容数据：每天一条 ============ */
-
-const DAILY = [
-  {
-    track:"科技", title:"CAP 真正在交易的是什么",
-    hook:"「三选二」是被简化过的说法，真正的约束是「分区发生时，你要一致性还是要可用」。",
-    reads:[
-      "先读 CAP 原始表述（Brewer 2000）里对「分区容忍」的定义，注意它不是一个可选项，而是网络的本性。",
-      "再读 PACELC：如果没有分区（E），延迟（L）和一致性（C）之间还要再选一次。",
-      "最后对照你熟悉的 Redis 主从和 Pulsar 的多副本，各自在正常态与分区态做了什么取舍。"
-    ],
-    quiz:[
-      "为什么说「分区容忍」不是你可以主动放弃的选项？",
-      "CP 系统在分区期间拒绝写入，用户实际感知到什么？这和「不可用」有区别吗？",
-      "PACELC 里的 L 为什么会在无分区时也逼你做选择？"
-    ],
-    link:"把 CAP 和你手上的缓存一致性、消息投递语义放在一起看——它们其实是同一个「取舍」在不同层次上的重复出现。"
-  },
-  {
-    track:"科技", title:"布隆过滤器的假阳性为什么可以接受",
-    hook:"它用「可能在里面」换来了极大的空间节省，前提是你能容忍「偶尔误判为存在」。",
-    reads:[
-      "搞清位数组长度 m、哈希函数个数 k、元素个数 n 三者如何共同决定假阳性率。",
-      "想清楚为什么它不能删除元素，以及 counting bloom filter 付出了什么代价。",
-      "找一个真实用途：缓存穿透防护、爬虫 URL 去重、数据库 SSTable 查找。"
-    ],
-    quiz:[
-      "为什么增加哈希函数个数 k 一开始降低假阳性率，但过多反而升高？",
-      "在缓存穿透场景里，假阳性会导致什么后果？这个后果能接受吗？",
-      "如果业务要求「绝对不能误判」，你还用布隆过滤器吗？替代方案是什么？"
-    ],
-    link:"它和「用概率换空间」的其他结构（HyperLogLog、Count-Min Sketch）是同一族思路，值得放一起记。"
-  },
-  {
-    track:"历史", title:"大航海时代的「信息差」是怎么定价的",
-    hook:"香料在产地和欧洲的价格差上百倍，中间的不是运费，是「谁先知道、谁敢赌」。",
-    reads:[
-      "看一段关于胡椒贸易路线的描述，数一数从马鲁古到威尼斯经过几道手。",
-      "读荷兰东印度公司（VOC）的成立逻辑：为什么它要做成世界上第一家股份制公司。",
-      "注意「风险」是怎么被拆成股份卖掉的——这是现代金融的起点之一。"
-    ],
-    quiz:[
-      "为什么早期远航必须靠「股份制」而不能靠单个商人？",
-      "价格差里，哪一部分是运输成本，哪一部分是风险溢价，哪一部分是信息垄断？",
-      "今天的什么生意，本质上还是「我知道你不知道」？"
-    ],
-    link:"VOC 的股份制 = 把不确定性切成可交易的碎片。和你熟悉的「风险分散」是一回事。"
-  },
-  {
-    track:"常识", title:"血压、血糖、血脂，三个指标各在说什么",
-    hook:"它们不是三个「健康分数」，而是三套不同系统的运行参数。",
-    reads:[
-      "搞清血压的「高压/低压」分别对应心脏的哪个动作。",
-      "搞清空腹血糖和餐后血糖为什么都要看，哪个更能反映早期问题。",
-      "搞清 LDL 和 HDL 的分工，为什么「总胆固醇」这个数字几乎没有意义。"
-    ],
-    quiz:[
-      "为什么单纯收缩压高（老人常见）和单纯舒张压高，风险不一样？",
-      "空腹血糖正常，就一定能排除糖代谢问题吗？",
-      "为什么医生说「降 LDL 比降总胆固醇重要」？"
-    ],
-    link:"三个指标都在描述「管道系统的压力/流量/沉积」，这个类比能帮你记住大部分常识。"
-  },
-  {
-    track:"思维", title:"机会成本与沉没成本，最容易搞反的一对",
-    hook:"已经花掉的钱不该影响决策，但没花掉的选择必须算进去。",
-    reads:[
-      "找两个自己的真实例子：一个「因为已经投入所以继续」的时刻。",
-      "搞清机会成本的定义里为什么必须包含「次优选项的价值」。",
-      "看一个「免费」的东西如何用你的时间作为代价。"
-    ],
-    quiz:[
-      "你花 200 块买了张电影票，看了 20 分钟发现很难看。票价该影响你走不走吗？",
-      "为什么「我在这行干了十年」不能作为继续干下去的理由？",
-      "机会成本在什么情况下接近于零？"
-    ],
-    link:"沉没成本偏误和「损失厌恶」是连在一起的——不继续就等于承认损失。"
-  },
-  {
-    track:"科技", title:"从 Raft 建立「共识」的最小心智模型",
-    hook:"共识不是「大家想法一样」，而是「在部分人失联时，仍能对下一步达成唯一结论」。",
-    reads:[
-      "只看 Raft 的「领导者选举」和「日志复制」两节，先别看成员变更。",
-      "搞清 term（任期）这个编号存在的唯一目的：识别过期的领导者。",
-      "想清楚为什么「多数派」就够了，而不是「全部」。"
-    ],
-    quiz:[
-      "5 个节点里坏了 2 个，还能选主吗？坏 3 个呢？为什么分界点在多数派？",
-      "为什么新领导者必须先同步日志，而不能直接开始接受写入？",
-      "Raft 和 Paxos 在「可理解性」上的差别，是工程问题还是理论问题？"
-    ],
-    link:"多数派 + 任期 = 用「时间编号」解决「谁说了算」。这个模式和很多分布式锁方案同构。"
-  },
-  {
-    track:"历史", title:"工业革命为什么先发生在英国",
-    hook:"不是英国人更聪明，是煤、工资、制度三件事恰好凑在了一起。",
-    reads:[
-      "读「高工资 + 廉价煤」这个解释：为什么昂贵的劳动力反而推动机械化。",
-      "看专利制度和《垄断法》在其中起的作用。",
-      "对比同期的中国和印度：技术差得不多，差在哪一环？"
-    ],
-    quiz:[
-      "为什么「劳动力贵」会推动机器替代，而不是让人更便宜地干活？",
-      "煤离地表近这件事，具体降了什么成本？",
-      "如果没有专利保护，蒸汽机会不会照样出现？"
-    ],
-    link:"这是「要素价格决定技术方向」的经典案例，和今天用 AI 替代哪部分人力是同一个逻辑。"
-  },
-  {
-    track:"常识", title:"睡眠周期与「补觉」能不能补回来",
-    hook:"睡眠不是一块可以攒起来的时间，它更像一个有固定工序的流水线。",
-    reads:[
-      "搞清深睡（慢波）和 REM 分别大致在夜间什么位置密集出现。",
-      "看「睡眠债」的研究：哪些指标能补回来，哪些补不回来。",
-      "搞清咖啡因的半衰期，以及它遮蔽的是「困意」还是「损伤」。"
-    ],
-    quiz:[
-      "为什么熬夜后第二天睡到中午，仍然觉得没恢复？",
-      "周末补觉能补回多少？哪部分补不回来？",
-      "为什么睡前看手机会推迟入睡，而不只是「让人兴奋」？"
-    ],
-    link:"「流水线」类比也适用于饮食和运动——很多生理过程是有顺序的，不是总量守恒。"
-  },
-  {
-    track:"思维", title:"基础比率：为什么直觉总在概率上翻车",
-    hook:"一个 99% 准确的检测，在低发病率人群里，阳性结果可能大部分是误报。",
-    reads:[
-      "用 10000 人、1% 发病率、99% 灵敏度、1% 假阳性率算一遍，看看阳性里真正患病的比例。",
-      "搞清贝叶斯更新里「先验」的作用。",
-      "找一个自己被基础比率骗过的例子（体检报告、新闻里的风险数字）。"
-    ],
-    quiz:[
-      "发病率 1%，检测灵敏度 99%，假阳性率 1%，阳性者真患病概率是多少？",
-      "为什么医生也会在这个问题上出错？",
-      "如果给同一个人做第二次检测，概率怎么变？为什么？"
-    ],
-    link:"这个反直觉结果是你判断所有「风险新闻」的基本工具，值得把它算到能背下来。"
-  },
-  {
-    track:"科技", title:"冯·诺依曼瓶颈与缓存为什么统治性能",
-    hook:"CPU 快得离谱，内存慢得离谱，于是「数据在哪里」比「算得多快」更决定性能。",
-    reads:[
-      "看一遍存储层次的延迟数量级：寄存器 / L1 / L2 / 内存 / SSD / 网络 / 磁盘。",
-      "搞清「缓存行」是 64 字节这件事，以及它对数组遍历方式的影响。",
-      "理解「顺序访问」为什么比「随机访问」快一个数量级。"
-    ],
-    quiz:[
-      "为什么遍历二维数组时，先走行还是先走列，性能能差好几倍？",
-      "为什么「减少一次远程调用」往往比「优化一段循环」收益更大？",
-      "缓存命中率从 95% 提到 99%，实际延迟降多少？"
-    ],
-    link:"这就是你做 Redis 缓存、批量合并请求、预取的理论依据——不是技巧，是物理。"
-  },
-  {
-    track:"历史", title:"宋朝的商业革命与纸币的诞生",
-    hook:"交子不是因为「聪明」，是因为铜钱重到运不动了。",
-    reads:[
-      "搞清交子从民间信用凭证到官方发行的那一步，以及它为什么失败。",
-      "看宋朝城市化与坊市制度瓦解的关系。",
-      "对比同一时期欧洲的金融工具。"
-    ],
-    quiz:[
-      "纸币最早为什么是「存款凭证」而不是「钱」？",
-      "交子最终贬值，直接原因是什么？",
-      "为什么「币值稳定」需要的不只是发行方的信用？"
-    ],
-    link:"从凭证到货币的那一步，和今天从「积分」到「稳定币」的争论结构相同。"
-  },
-  {
-    track:"常识", title:"食物保存的四种原理",
-    hook:"所有防腐手段，本质上只做四件事之一：去水、降温、调酸、隔绝氧。",
-    reads:[
-      "对照腌、晒、冷藏、真空、发酵，各归到哪一类。",
-      "搞清「细菌不是被杀死了，只是不繁殖」这个区别。",
-      "看一遍冰箱不同温区的实际温度，以及为什么鸡蛋该放哪儿。"
-    ],
-    quiz:[
-      "为什么蜂蜜几乎不坏？",
-      "冷冻能杀死细菌吗？解冻后为什么更容易坏？",
-      "「常温酸奶」为什么能常温保存？"
-    ],
-    link:"四种原理可以当成一个检查清单：想让某样东西放久，先问自己动的是哪一条。"
-  },
-  {
-    track:"思维", title:"激励扭曲：指标一考核就失真",
-    hook:"你考核什么，就得到什么——而且只得到那个，代价另算。",
-    reads:[
-      "看「眼镜蛇效应」和「古德哈特定律」的原始例子。",
-      "找一个「KPI 达成但业务变差」的真实案例。",
-      "想清楚：如果必须考核，怎么设计才能少一点副作用？"
-    ],
-    quiz:[
-      "为什么「响应时间 P99」被考核后，工程师会开始丢请求？",
-      "古德哈特定律说的是「指标不好」，还是「指标一旦成为目标就失效」？",
-      "有没有哪类指标相对抗扭曲？它们的共同点是什么？"
-    ],
-    link:"这条规律同时适用于公司、学校和你自己定的年度计划。"
-  },
-  {
-    track:"科技", title:"「至少一次」与「恰好一次」的神话",
-    hook:"分布式系统里没有真正免费的「恰好一次」，只有「至少一次 + 幂等」。",
-    reads:[
-      "搞清为什么「确认消息」这一步在网络上必然可能丢失。",
-      "理解幂等键（idempotency key）是怎么把重复变成无害的。",
-      "对照 Pulsar 的订阅类型（Exclusive / Shared / Failover）与各自的投递语义。"
-    ],
-    quiz:[
-      "生产者重试导致的重复，和消费者重投导致的重复，处理方式一样吗？",
-      "为什么「恰好一次」总要在某个地方依赖状态存储？",
-      "去重窗口设多大？凭什么是这个数？"
-    ],
-    link:"幂等 = 把「次数」问题转化成「状态」问题。这个转化技巧在很多地方都能用。"
-  },
-  {
-    track:"历史", title:"印刷术与宗教改革",
-    hook:"技术本身不改变思想，但它能改变思想传播的成本和速度。",
-    reads:[
-      "看古腾堡印刷术之前，一本书的抄写成本意味着谁能读到它。",
-      "读马丁·路德《九十五条论纲》在两周内传遍德意志的过程。",
-      "注意「翻译成方言」这一步为什么是决定性的。"
-    ],
-    quiz:[
-      "为什么印刷术出现之前，异端思想很难成规模？",
-      "「翻译成本降低」在这件事里起了什么作用？",
-      "今天的什么技术，正在扮演当年印刷术的角色？"
-    ],
-    link:"传播成本下降 → 权威分散 → 新秩序。这个链条在后面每次媒介革命里都重演。"
-  },
-  {
-    track:"常识", title:"复利，以及更该被重视的「负复利」",
-    hook:"复利是小斜率乘长时间，而负复利会以同样的速度把你拉回去。",
-    reads:[
-      "算一遍：年化 7%，多少年翻倍？（72 法则）",
-      "算一遍：每年亏 10%，十年后剩多少？",
-      "把「健康、信任、技能」也放进这个模型里看。"
-    ],
-    quiz:[
-      "为什么「先涨 50% 再跌 50%」不是回本，而是亏 25%？",
-      "72 法则为什么成立？它的适用范围到哪儿？",
-      "负复利里，哪一类最难逆转？"
-    ],
-    link:"「回本需要的涨幅」和「亏损的幅度」不对称——这个不对称是风险管理的核心。"
-  },
-  {
-    track:"思维", title:"边际效用递减与「够用」",
-    hook:"第一杯水救命，第十杯水是负担。价值的判断要以「下一单位」为准。",
-    reads:[
-      "搞清「边际」和「平均」的区别，为什么决策只看边际。",
-      "看收入与幸福感的曲线在哪个点开始变平。",
-      "找一个自己「已经过量但还在加」的东西。"
-    ],
-    quiz:[
-      "为什么「沉没成本」不该进决策，而「边际成本」必须进？",
-      "为什么加薪带来的快乐衰减得比想象中快？",
-      "「够用」是一个价值判断还是事实判断？"
-    ],
-    link:"边际思维是经济学给你最实用的一件工具，它几乎能重写你所有的取舍。"
-  },
-  {
-    track:"科技", title:"公钥密码为什么依赖「单向」数学",
-    hook:"加密和解密用的是同一对钥匙的两面，安全性来自「算得动正向，算不动反向」。",
-    reads:[
-      "搞清 RSA 依赖的是大数分解难，而 ECC 依赖的是离散对数难。",
-      "理解「数字签名」为什么用私钥签、公钥验，而不是反过来。",
-      "搞清 HTTPS 握手时，非对称加密只用来协商，之后换成对称加密。"
-    ],
-    quiz:[
-      "为什么非对称加密不直接用来传大量数据？",
-      "签名和加密用的密钥方向为什么相反？",
-      "如果量子计算机成熟，受威胁的是 RSA 还是对称加密？"
-    ],
-    link:"「单向函数」这个结构，和哈希、和布隆过滤器、和区块链是同一个数学直觉的不同用法。"
-  },
-  {
-    track:"历史", title:"罗马道路网与「规模的成本」",
-    hook:"路修得越好，帝国越大，边境防线就越长，维持成本最终压过了收益。",
-    reads:[
-      "看罗马道路的建造标准和它的军事目的。",
-      "读「帝国过度扩张」的讨论：为什么防御成本随面积超线性增长。",
-      "对比汉朝的长城与屯田，看两者怎么解决同一个问题。"
-    ],
-    quiz:[
-      "为什么「版图越大越安全」这个直觉是错的？",
-      "道路降低的是哪一类成本？它同时提高了什么？",
-      "有什么现代组织也在经历同样的「边境太长」？"
-    ],
-    link:"「规模收益递减」不只适用于帝国，也适用于团队、代码库和你的待办清单。"
-  },
-  {
-    track:"常识", title:"家庭用电与用水的几条硬常识",
-    hook:"大部分事故不是因为不懂原理，是因为不知道「哪一步不能省」。",
-    reads:[
-      "搞清空气开关、漏电保护器、地线三者各管什么，缺一个会怎样。",
-      "搞清「带电作业」的边界：什么情况下必须先断电。",
-      "看一遍水管冻裂的原理，以及为什么长期离家要关总阀。"
-    ],
-    quiz:[
-      "漏电保护器能替代地线吗？为什么不能？",
-      "为什么湿手碰开关危险，而不只是「不舒服」？",
-      "水管冻裂是冻的时候裂，还是化的时候裂？"
-    ],
-    link:"「三条防线各管一件事」这个结构，和你做系统高可用时的多级兜底是同构的。"
-  },
-  {
-    track:"思维", title:"幸存者偏差与成功学",
-    hook:"你看到的样本，是被结果筛选过的样本，不是随机样本。",
-    reads:[
-      "看二战飞机装甲的经典案例（幸存者返航的弹孔分布）。",
-      "想清楚「沉默的数据」在哪里：倒闭的公司、退学的学生、没写出来的书。",
-      "找一篇成功学案例，问：同样做法但失败的人有多少？"
-    ],
-    quiz:[
-      "为什么「弹孔多的地方不该加固」？",
-      "创业成功者访谈里，最系统性的缺失信息是什么？",
-      "怎么才能看到「没说话的那部分样本」？"
-    ],
-    link:"它和基础比率是同一枚硬币：一个说你忽略了先验，一个说你忽略了分母。"
-  },
-  {
-    track:"科技", title:"消息队列到底解决了什么，又引入了什么",
-    hook:"它把「同步调用」变成「异步解耦」，代价是你失去了「立刻知道结果」。",
-    reads:[
-      "列出 MQ 的三个真实价值：削峰、解耦、异步，各找一个具体场景。",
-      "搞清「消息积压」时到底发生了什么，以及为什么扩容不一定有用。",
-      "看一遍死信队列的设计意图。"
-    ],
-    quiz:[
-      "为什么引入 MQ 之后，「数据一致性」反而更难保证？",
-      "消费端扩容到 10 倍，积压一定消失吗？卡在哪里？",
-      "顺序消费的代价是什么？"
-    ],
-    link:"MQ 是「用时间换耦合度」。所有异步方案本质都是这个交易。"
-  },
-  {
-    track:"历史", title:"明治维新与「选择性学习」",
-    hook:"同样面对西方冲击，为什么日本和清政府的应对走向了两个方向？",
-    reads:[
-      "看「黑船来航」之后日本内部的权力结构发生了什么变化。",
-      "读岩仓使节团出访的目的：不是买设备，是去看制度。",
-      "对比洋务运动的「中体西用」与「和魂洋才」的差别。"
-    ],
-    quiz:[
-      "为什么「只学技术不学制度」在两国都出现了，结果却不同？",
-      "明治维新里，哪一步是「必须先做的」？",
-      "「选择性学习」的边界在哪里：什么能选，什么不能？"
-    ],
-    link:"这是「面对降维打击如何回应」的历史样本，对个人应对 AI 冲击有直接参照。"
-  },
-  {
-    track:"常识", title:"概率里最反直觉的三件事",
-    hook:"独立、大数、回归均值——三个词各自都能让人亏钱。",
-    reads:[
-      "搞清「赌徒谬误」：连续十次正面，下一次仍是 50%。",
-      "搞清「大数定律」需要多大样本才起效，以及它不保证「短期回归」。",
-      "搞清「回归均值」：极端表现的下一步大概率更普通，不是因为「被诅咒」。"
-    ],
-    quiz:[
-      "为什么「连开十把大，下一把该开小」是错的？",
-      "抛硬币一万次，正面比例接近 50%，但正面的「次数差」在扩大还是缩小？",
-      "运动员上了封面之后表现下滑，是封面带来的霉运吗？"
-    ],
-    link:"这三条合起来，就是「别用短期结果推断长期规律」的完整防线。"
-  }
-];
-
-/* 初始示例卡：可以随时删掉 */
-const SEED_CARDS = [
-  {t:"多数派", e:"只要超过一半的节点达成一致，就能抵抗少数派失联或作乱，因为任意两个多数派必然有交集。",
-   x:"5 节点集群容忍 2 个故障，第 3 个坏掉就失去多数派。", r:"和「法定人数」是一回事，区别在于它强调的是集合交集这个数学性质。"},
-  {t:"幂等", e:"同一个操作执行一次和执行多次，对外部状态的影响相同。",
-   x:"支付请求带同一个幂等键重试，只会扣一次钱。", r:"和「去重」相关，但幂等是设计目标，去重是其中一种实现手段。"},
-  {t:"机会成本", e:"为了做这件事而放弃的、价值最高的那个替代选项。",
-   x:"周末加班的机会成本可能是陪家人的时间，而不是「休息」。", r:"和沉没成本正好相反：沉没成本已发生不该算，机会成本未发生必须算。"},
-  {t:"基础比率", e:"在没有任何个体信息时，一个事件在总体中出现的比例。",
-   x:"某病发病率 1%，这就是先验概率。", r:"和贝叶斯更新是一对：先验是基础比率，新证据用来修正它。"},
-  {t:"负复利", e:"持续的负向累积，会以指数方式侵蚀存量。",
-   x:"每年亏 10%，十年后只剩 35%。", r:"和正复利同构，但心理上被低估，因为损失厌恶让人不愿算这笔账。"}
-];
-
-/* ============ 存储层 ============ */
-
-let MEM = null;
-const LS_OK = (function(){
-  try{ localStorage.setItem('__probe','1'); localStorage.removeItem('__probe'); return true; }
-  catch(e){ return false; }
-})();
-
-function load(){
-  if(!LS_OK) return MEM || [];
-  try{ return JSON.parse(localStorage.getItem('kb_cards') || '[]'); }catch(e){ return []; }
-}
-function save(list){
-  if(!LS_OK){ MEM = list; return; }
-  try{ localStorage.setItem('kb_cards', JSON.stringify(list)); }catch(e){ toast('保存失败，存储空间可能已满'); }
-}
+/* ================= 日期与工具 ================= */
 
 const DAY = 86400000;
-const INTERVALS = [1, 3, 7, 21, 60, 120];
-
-function mkCard(o){
-  const now = Date.now();
-  return { id:'c'+now+Math.random().toString(36).slice(2,7),
-           t:o.t||'', e:o.e||'', x:o.x||'', r:o.r||'',
-           stage:0, due:now + DAY, added:now };
-}
-
-function ensureSeed(){
-  const list = load();
-  if(list.length === 0){
-    const seeded = SEED_CARDS.map(mkCard);
-    save(seeded);
-    return seeded;
-  }
-  return list;
-}
-
-/* ============ 工具 ============ */
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function pad(n){ return n<10?'0'+n:''+n; }
@@ -674,10 +262,9 @@ function todayKey(){
   const d = new Date();
   return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
 }
-function dayIndex(){
+function dayNum(){
   const d = new Date();
-  const local = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  return Math.floor(local / DAY);
+  return Math.floor(new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime() / DAY);
 }
 function fmtDate(){
   const d = new Date();
@@ -688,7 +275,6 @@ function md(ts){
   const d = new Date(ts);
   return (d.getMonth()+1)+'月'+d.getDate()+'日';
 }
-
 let toastTimer = null;
 function toast(msg){
   const el = document.getElementById('toast');
@@ -697,7 +283,226 @@ function toast(msg){
   toastTimer = setTimeout(()=>el.classList.remove('show'), 1800);
 }
 
-/* ============ 导航 ============ */
+/* ================= 存储 ================= */
+
+let MEM = {};
+const LS_OK = (function(){
+  try{ localStorage.setItem('__probe','1'); localStorage.removeItem('__probe'); return true; }
+  catch(e){ return false; }
+})();
+
+function readStore(key, fallback){
+  if(!LS_OK) return MEM[key] !== undefined ? MEM[key] : fallback;
+  try{
+    const raw = localStorage.getItem(key);
+    return raw === null ? fallback : JSON.parse(raw);
+  }catch(e){ return fallback; }
+}
+function writeStore(key, val){
+  if(!LS_OK){ MEM[key] = val; return; }
+  try{ localStorage.setItem(key, JSON.stringify(val)); }
+  catch(e){ toast('保存失败，存储空间可能已满'); }
+}
+
+const loadCards = () => readStore('kb_cards', []);
+const saveCards = (list) => writeStore('kb_cards', list);
+const loadRead = () => readStore('kb_read', {});
+const saveRead = (m) => writeStore('kb_read', m);
+
+const INTERVALS = [1, 3, 7, 21, 60, 120];
+
+function mkCard(o){
+  const now = Date.now();
+  return { id:'c'+now+Math.random().toString(36).slice(2,7),
+           t:o.t||'', e:o.e||'', x:o.x||'', r:o.r||'',
+           stage:0, due:now + DAY, added:now };
+}
+
+const SEED_CARDS = [
+  {t:'多数派', e:'只要超过一半的节点达成一致，就能抵抗少数派失联或作乱，因为任意两个多数派必然有交集。',
+   x:'5 节点集群容忍 2 个故障，第 3 个坏掉就失去多数派。', r:'和「法定人数」是一回事，区别在于它强调的是集合交集这个数学性质。'},
+  {t:'幂等', e:'同一个操作执行一次和执行多次，对外部状态的影响相同。',
+   x:'支付请求带同一个幂等键重试，只会扣一次钱。', r:'和「去重」相关，但幂等是设计目标，去重是其中一种实现手段。'},
+  {t:'机会成本', e:'为了做这件事而放弃的、价值最高的那个替代选项。',
+   x:'周末加班的机会成本可能是陪家人的时间，而不是「休息」。', r:'和沉没成本正好相反：沉没成本已发生不该算，机会成本未发生必须算。'},
+  {t:'基础比率', e:'在没有任何个体信息时，一个事件在总体中出现的比例。',
+   x:'某病发病率 1%，这就是先验概率。', r:'和贝叶斯更新是一对：先验是基础比率，新证据用来修正它。'}
+];
+
+function ensureSeed(){
+  const list = loadCards();
+  if(list.length === 0){
+    const seeded = SEED_CARDS.map(mkCard);
+    saveCards(seeded);
+    return seeded;
+  }
+  return list;
+}
+
+/* ================= 领域 ================= */
+
+const DKEYS = (typeof DOMAINS !== 'undefined') ? Object.keys(DOMAINS) : [];
+
+function dmeta(k){
+  const d = DOMAINS[k] || {};
+  return { color: d.color || '#4da3ff', items: d.items || [] };
+}
+
+const PER_DAY = 8;
+
+function hashKey(s){
+  let h = 0;
+  for(let i=0;i<s.length;i++) h = (h*31 + s.charCodeAt(i)) % 100000;
+  return h;
+}
+
+/* 每天：按日期轮转挑选 8 个领域，每个领域按 hash + 日期步进挑一条 */
+function digestFor(dayN, offset, filter){
+  const out = [];
+  const n = DKEYS.length;
+  if(!n) return out;
+  const count = Math.min(PER_DAY, n);
+  const start = ((dayN + offset) % n + n) % n;
+  for(let i=0;i<count;i++){
+    const key = DKEYS[(start + i) % n];
+    if(filter && filter !== 'all' && key !== filter) continue;
+    const pool = dmeta(key).items;
+    if(!pool.length) continue;
+    const step = (dayN + offset) * 7 + hashKey(key);
+    const idx = ((step % pool.length) + pool.length) % pool.length;
+    out.push({ domain:key, item:pool[idx] });
+  }
+  return out;
+}
+
+/* ================= 今日 ================= */
+
+let spinOffset = 0;
+let todayFilter = 'all';
+const expanded = new Set();
+let CURRENT = [];   // 当前渲染出的条目，内联事件按索引取，避免把标题拼进 onclick
+
+function readSet(){
+  const m = loadRead();
+  return new Set(m[todayKey()] || []);
+}
+function setRead(title, on){
+  const m = loadRead();
+  const k = todayKey();
+  const arr = new Set(m[k] || []);
+  if(on) arr.add(title); else arr.delete(title);
+  m[k] = Array.from(arr);
+  // 只保留最近 60 天
+  const keys = Object.keys(m).sort();
+  while(keys.length > 60){ delete m[keys.shift()]; }
+  saveRead(m);
+}
+
+function renderChips(){
+  const box = document.getElementById('chips');
+  if(!DKEYS.length){ box.innerHTML = ''; return; }
+  const mk = (k, label) =>
+    `<button class="chip ${todayFilter===k?'on':''}" onclick="setFilter('${esc(k)}')">${esc(label)}</button>`;
+  box.innerHTML = mk('all','全部') + DKEYS.map(k => mk(k, k)).join('');
+}
+function setFilter(k){ todayFilter = k; renderChips(); renderToday(); }
+
+function renderToday(){
+  document.getElementById('hdDate').textContent = fmtDate();
+
+  if(!DKEYS.length){
+    document.getElementById('todayBody').innerHTML =
+      '<div class="empty">没找到内容数据。<br>确认 <b>data.js</b> 和 index.html 在同一个目录。</div>';
+    document.getElementById('hdCount').textContent = '';
+    return;
+  }
+
+  const all = digestFor(dayNum(), spinOffset, 'all');
+  const list = digestFor(dayNum(), spinOffset, todayFilter);
+  CURRENT = list;
+  const rs = readSet();
+  const doneCount = all.filter(x => rs.has(x.item.t)).length;
+
+  document.getElementById('hdCount').textContent = `已读 ${doneCount} / ${all.length}`;
+  document.getElementById('hbarFill').style.width = (all.length ? (doneCount/all.length*100) : 0) + '%';
+
+  if(!list.length){
+    document.getElementById('todayBody').innerHTML =
+      '<div class="empty">这个方向今天没有排到。<br>点上面「全部」。</div>';
+    return;
+  }
+
+  document.getElementById('todayBody').innerHTML = list.map(({domain, item}, idx) => {
+    const open = expanded.has(item.t);
+    const isRead = rs.has(item.t);
+    const color = dmeta(domain).color;
+    return `<div class="item ${open?'open':''} ${isRead?'read':''}">
+      <div class="item-hd" onclick="toggleItem(${idx})">
+        <span class="dot" style="background:${color}"></span>
+        <span class="txt">
+          <span class="dname">${esc(domain)}</span>
+          <span class="ttl">${esc(item.t)}</span>
+          ${open ? '' : `<span class="hook">${esc(item.h)}</span>`}
+        </span>
+        <span class="chev">›</span>
+      </div>
+      ${open ? `<div class="item-bd">
+        <div class="sec">
+          <div class="sec-t">输入（挑一个，读完再动笔）</div>
+          <ul class="reads">${item.r.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+        </div>
+        <div class="sec">
+          <div class="sec-t">自测（合上材料再答）</div>
+          <ol class="quiz">${item.q.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+        </div>
+        <div class="sec">
+          <div class="sec-t">连线</div>
+          <div class="link-note">${esc(item.l)}</div>
+        </div>
+        <div class="item-foot">
+          <button class="btn sm ${isRead?'done':''}" onclick="event.stopPropagation();markRead(${idx},${isRead})">
+            ${isRead ? '已读 ✓ 撤销' : '读完了 ✓'}
+          </button>
+          <button class="btn sm" onclick="event.stopPropagation();go('cards')">记一张卡</button>
+        </div>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+
+  if(todayFilter === 'all'){
+    const left = all.length - doneCount;
+    document.getElementById('todayBody').insertAdjacentHTML('beforeend',
+      left > 0
+        ? `<div class="progress" style="margin-top:14px">今天还剩 ${left} 条</div>`
+        : `<div class="progress" style="margin-top:14px;color:var(--ok)">今天的 8 条读完了 ✓ 点「换一批」再来一组</div>`);
+  }
+}
+
+function toggleItem(idx){
+  const cur = CURRENT[idx];
+  if(!cur) return;
+  const t = cur.item.t;
+  if(expanded.has(t)) expanded.delete(t);
+  else expanded.add(t);
+  renderToday();
+}
+
+function markRead(idx, currentlyRead){
+  const cur = CURRENT[idx];
+  if(!cur) return;
+  setRead(cur.item.t, !currentlyRead);
+  renderToday();
+  if(!currentlyRead) toast('记下了');
+}
+
+function spinToday(){
+  spinOffset = (spinOffset + 1) % 997;
+  expanded.clear();
+  renderToday();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ================= 导航 ================= */
 
 let current = 'today';
 function go(tab){
@@ -710,64 +515,19 @@ function go(tab){
   window.scrollTo(0,0);
   if(tab === 'cards') renderCards();
   if(tab === 'review') renderReview();
-  if(tab === 'today') renderToday();
+  if(tab === 'today'){ renderChips(); renderToday(); }
+  if(tab === 'more') renderCorpus();
   updateBadge();
 }
 
-/* ============ 今日 ============ */
-
-let spinOffset = 0;
-
-function todayEntry(){
-  const idx = ((dayIndex() + spinOffset) % DAILY.length + DAILY.length) % DAILY.length;
-  return DAILY[idx];
-}
-
-function renderToday(){
-  const e = todayEntry();
-  document.getElementById('hdDate').textContent = fmtDate();
-  document.getElementById('hdTrack').textContent = e.track;
-
-  const html = `
-    <h1>${esc(e.title)}</h1>
-    <p class="hook">${esc(e.hook)}</p>
-
-    <div class="sec">
-      <div class="sec-t">输入（挑一个，读完再动笔）</div>
-      <ul class="reads">${e.reads.map(r=>`<li>${esc(r)}</li>`).join('')}</ul>
-    </div>
-
-    <div class="sec">
-      <div class="sec-t">自测（合上材料再答）</div>
-      <ol class="quiz">${e.quiz.map(q=>`<li>${esc(q)}</li>`).join('')}</ol>
-    </div>
-
-    <div class="sec">
-      <div class="sec-t">连线</div>
-      <div class="link-note">${esc(e.link)}</div>
-    </div>
-  `;
-  document.getElementById('todayBody').innerHTML = html;
-  document.getElementById('hdTrack').textContent = e.track;
-}
-
-function spinToday(){
-  spinOffset = (spinOffset + 1) % DAILY.length;
-  renderToday();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-/* ============ 卡片 ============ */
+/* ================= 卡片 ================= */
 
 function toggleForm(){
   const f = document.getElementById('cardForm');
   const open = f.style.display === 'none';
   f.style.display = open ? 'block' : 'none';
   if(open){
-    document.getElementById('f-t').value = '';
-    document.getElementById('f-e').value = '';
-    document.getElementById('f-x').value = '';
-    document.getElementById('f-r').value = '';
+    ['f-t','f-e','f-x','f-r'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('f-t').focus();
   }
 }
@@ -777,30 +537,28 @@ function saveCard(){
   const e = document.getElementById('f-e').value.trim();
   if(!t){ toast('至少写个概念名'); return; }
   if(!e){ toast('「我的解释」不能空——这才是学没学会的地方'); return; }
-  const list = load();
+  const list = loadCards();
   list.unshift(mkCard({
-    t,
-    e,
+    t, e,
     x: document.getElementById('f-x').value.trim(),
     r: document.getElementById('f-r').value.trim()
   }));
-  save(list);
+  saveCards(list);
   toggleForm();
   renderCards();
   updateBadge();
   toast('已保存，明天进入复习');
 }
 
-function isDue(c){ return c.due <= Date.now(); }
+const isDue = (c) => c.due <= Date.now();
 
 function renderCards(){
-  const list = load();
+  const list = loadCards();
   const box = document.getElementById('cardList');
-  let warn = '';
-  if(!LS_OK) warn = '<div class="warnbar">此浏览器禁用了本地存储，卡片只存在内存里，刷新会丢。换用 Chrome / Safari 打开。</div>';
+  let warn = LS_OK ? '' : '<div class="warnbar">这个浏览器禁用了本地存储，卡片只存在内存里，刷新会丢。请用 Safari 打开公网地址。</div>';
 
   if(list.length === 0){
-    box.innerHTML = warn + '<div class="empty">还没有卡片。<br>去「今日」读一点，然后用自己的话写一张。</div>';
+    box.innerHTML = warn + '<div class="empty">还没有卡片。<br>去「今日」读一条，然后用自己的话写一张。</div>';
     return;
   }
   const dueN = list.filter(isDue).length;
@@ -826,37 +584,34 @@ function renderCards(){
 
 function delCard(id){
   if(!confirm('删除这张卡片？')) return;
-  save(load().filter(c=>c.id !== id));
+  saveCards(loadCards().filter(c=>c.id !== id));
   renderCards(); updateBadge();
 }
 
-/* ============ 复习 ============ */
+/* ================= 复习 ================= */
 
-/* 会话队列用固定快照：评分后卡片会被推远，若每轮重新计算到期列表，
-   索引就会错位跳过下一张。 */
 let sessionQueue = null;
 let reviewIndex = 0;
 let revealed = false;
 
 function buildSession(){
-  sessionQueue = load().filter(isDue).sort((a,b)=>a.due - b.due).map(c=>c.id);
+  sessionQueue = loadCards().filter(isDue).sort((a,b)=>a.due - b.due).map(c=>c.id);
   reviewIndex = 0;
   revealed = false;
 }
-
 function restartReview(){ sessionQueue = null; reviewIndex = 0; revealed = false; renderReview(); }
 
 function renderReview(){
   if(sessionQueue === null) buildSession();
 
   if(sessionQueue.length === 0){
-    const list = load();
+    const list = loadCards();
     const next = list.slice().sort((a,b)=>a.due - b.due)[0];
     const hint = next
       ? `<div class="empty">今天没有到期的卡片。<br><br>下一张：<b>${esc(next.t)}</b><br>${md(next.due)} 到期</div>`
-      : `<div class="empty">还没有卡片。<br>去「今日」读一点，然后用自己的话写一张。</div>`;
+      : `<div class="empty">还没有卡片。<br>去「今日」读一条，然后用自己的话写一张。</div>`;
     document.getElementById('reviewBody').innerHTML = hint;
-    sessionQueue = null; // 下次进入时重新检查是否有新到期的
+    sessionQueue = null;
     updateBadge();
     return;
   }
@@ -870,7 +625,7 @@ function renderReview(){
     return;
   }
 
-  const c = load().find(x=>x.id === sessionQueue[reviewIndex]);
+  const c = loadCards().find(x=>x.id === sessionQueue[reviewIndex]);
   if(!c){ reviewIndex++; renderReview(); return; }
 
   document.getElementById('reviewBody').innerHTML = `
@@ -899,7 +654,7 @@ function reveal(){ revealed = true; renderReview(); }
 
 function grade(ok){
   const id = sessionQueue[reviewIndex];
-  const list = load();
+  const list = loadCards();
   const target = list.find(x=>x.id === id);
   let label = '';
   if(target){
@@ -912,7 +667,7 @@ function grade(ok){
       target.due = Date.now() + DAY;
       label = '打回一天，明天再来';
     }
-    save(list);
+    saveCards(list);
   }
   revealed = false;
   reviewIndex++;
@@ -922,13 +677,24 @@ function grade(ok){
 }
 
 function updateBadge(){
-  const n = load().filter(isDue).length;
+  const n = loadCards().filter(isDue).length;
   const b = document.getElementById('navBadge');
   if(n > 0){ b.textContent = n > 99 ? '99+' : n; b.style.display = 'inline-block'; }
   else b.style.display = 'none';
 }
 
-/* ============ 导入导出 ============ */
+/* ================= 更多 ================= */
+
+function renderCorpus(){
+  const el = document.getElementById('corpusInfo');
+  if(!el) return;
+  if(!DKEYS.length){ el.textContent = '未加载 data.js'; return; }
+  const total = DKEYS.reduce((s,k)=>s + dmeta(k).items.length, 0);
+  const rows = DKEYS.map(k=>`<b>${esc(k)}</b> ${dmeta(k).items.length}`).join(' · ');
+  el.innerHTML = `${DKEYS.length} 个领域，<b>${total}</b> 条，每天抽 8 条。<br>${rows}`;
+}
+
+/* ================= 导入导出 ================= */
 
 function download(name, text, mime){
   const blob = new Blob([text], {type: mime || 'text/plain;charset=utf-8'});
@@ -941,23 +707,21 @@ function download(name, text, mime){
 }
 
 function exportJSON(){
-  const list = load();
+  const list = loadCards();
   download('knowledge-cards-'+todayKey()+'.json', JSON.stringify(list, null, 2), 'application/json');
   toast('已导出 ' + list.length + ' 张');
 }
 
 function exportMD(){
-  const list = load();
+  const list = loadCards();
   if(!list.length){ toast('还没有卡片'); return; }
-  const lines = ['# 知识卡片', '', '导出时间：' + fmtDate() + ' ' + new Date().toTimeString().slice(0,5), ''];
+  const lines = ['# 知识卡片', '', '导出时间：' + fmtDate(), ''];
   list.forEach(c=>{
-    lines.push('## ' + c.t);
-    lines.push('');
+    lines.push('## ' + c.t, '');
     lines.push('- **解释**：' + (c.e || ''));
     if(c.x) lines.push('- **例子**：' + c.x);
     if(c.r) lines.push('- **连线**：' + c.r);
-    lines.push('- **下次复习**：' + new Date(c.due).toLocaleDateString('zh-CN'));
-    lines.push('');
+    lines.push('- **下次复习**：' + md(c.due), '');
   });
   download('knowledge-cards-'+todayKey()+'.md', lines.join('\n'), 'text/markdown;charset=utf-8');
   toast('已导出 Markdown');
@@ -971,7 +735,7 @@ function importJSON(ev){
     try{
       const data = JSON.parse(r.result);
       if(!Array.isArray(data)) throw new Error('格式不对');
-      const list = load();
+      const list = loadCards();
       const ids = new Set(list.map(c=>c.id));
       let added = 0;
       data.forEach(d=>{
@@ -980,7 +744,7 @@ function importJSON(ev){
           added++;
         }
       });
-      save(list);
+      saveCards(list);
       renderCards(); updateBadge();
       toast('导入 ' + added + ' 张');
     }catch(e){ toast('导入失败：文件不是有效备份'); }
@@ -992,30 +756,28 @@ function importJSON(ev){
 function resetAll(){
   if(!confirm('清空所有卡片？这个操作不能撤销，建议先导出备份。')) return;
   if(!confirm('真的确定？')) return;
-  save([]);
+  saveCards([]);
   renderCards(); updateBadge();
   toast('已清空');
 }
 
-/* ============ 启动 ============ */
+/* ================= 启动 ================= */
 
 (function init(){
   ensureSeed();
-  document.getElementById('hdDate').textContent = fmtDate();
-  const dc = document.getElementById('dayCount');
-  if(dc) dc.textContent = DAILY.length;
+  renderChips();
   renderToday();
+  renderCorpus();
   updateBadge();
   if(!LS_OK){
     document.body.insertAdjacentHTML('afterbegin',
-      '<div class="wrap"><div class="warnbar" style="margin-top:12px">当前浏览器不支持本地存储，卡片不会保存。请用 Chrome 或 Safari 打开本文件。</div></div>');
+      '<div class="wrap"><div class="warnbar" style="margin-top:12px">当前浏览器不支持本地存储，卡片和阅读进度都不会保存。请用 Safari 打开公网地址。</div></div>');
   }
-  // 每天零点后自动换内容
   let lastDay = todayKey();
   setInterval(()=>{
     const k = todayKey();
     if(k !== lastDay){
-      lastDay = k; spinOffset = 0;
+      lastDay = k; spinOffset = 0; expanded.clear();
       if(current === 'today') renderToday();
       updateBadge();
     }

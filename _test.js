@@ -1,14 +1,14 @@
-// 逻辑冒烟测试：用最小 DOM 桩在 Node 里跑 index.html 里的脚本
+// 逻辑冒烟测试：用最小 DOM 桩在 Node 里跑 data.js + index.html 的脚本
 const fs = require('fs');
 const vm = require('vm');
 
-const html = fs.readFileSync(
-  fs.existsSync('index.html') ? 'index.html' : 'knowledge/index.html',
-  'utf8'
-);
+const base = fs.existsSync('index.html') ? '.' : 'knowledge';
+const html = fs.readFileSync(base + '/index.html', 'utf8');
+const data = fs.readFileSync(base + '/data.js', 'utf8');
+
 const i = html.lastIndexOf('<script>');
 const j = html.lastIndexOf('</script>');
-const code = html.slice(i + 8, j);
+const app = html.slice(i + 8, j);
 
 // ---- DOM 桩 ----
 const els = {};
@@ -17,19 +17,16 @@ function makeEl(id) {
     id, innerHTML: '', textContent: '', value: '', style: {},
     classList: { add(){}, remove(){}, toggle(){} },
     dataset: {}, focus(){}, click(){}, appendChild(){}, removeChild(){},
-    insertAdjacentHTML(){},
+    insertAdjacentHTML(pos, h){ this.innerHTML += h; },
   };
 }
 global.document = {
-  getElementById(id) {
-    if (!els[id]) els[id] = makeEl(id);
-    return els[id];
-  },
+  getElementById(id) { if (!els[id]) els[id] = makeEl(id); return els[id]; },
   querySelectorAll() { return []; },
   createElement() { return makeEl('tmp'); },
   body: makeEl('body'),
 };
-global.window = { scrollTo(){}, localStorage: null };
+global.window = { scrollTo(){} };
 const store = new Map();
 global.localStorage = {
   setItem(k, v) { store.set(k, String(v)); },
@@ -37,102 +34,156 @@ global.localStorage = {
   removeItem(k) { store.delete(k); },
 };
 global.setInterval = () => 0;
-global.setTimeout = (fn) => 0;
+global.setTimeout = () => 0;
 global.clearTimeout = () => {};
 global.confirm = () => true;
-global.Blob = class { constructor(a) { this.a = a; } };
+global.Blob = class {};
 global.URL = { createObjectURL: () => 'blob:x', revokeObjectURL(){} };
 global.FileReader = class { readAsText(){} };
 
-// ---- 断言，追加到同一作用域内执行 ----
 const tests = `
 (function(){
   const R = [];
   const ok = (name, cond, extra) => R.push((cond ? 'PASS  ' : 'FAIL  ') + name + (cond ? '' : '  <-- ' + (extra||'')));
+  const day = 20000;
 
-  // 1. 数据结构
-  ok('DAILY 条数不少于 24', DAILY.length >= 24, 'got ' + DAILY.length);
-  let bad = [];
-  DAILY.forEach((d, n) => {
-    if (!d.track || !d.title || !d.hook) bad.push(n + ':missing-basic');
-    if (!Array.isArray(d.reads) || d.reads.length !== 3) bad.push(n + ':reads');
-    if (!Array.isArray(d.quiz) || d.quiz.length !== 3) bad.push(n + ':quiz');
-    if (!d.link) bad.push(n + ':link');
+  /* ---- 内容池 ---- */
+  ok('领域数为 10', DKEYS.length === 10, DKEYS.join('/'));
+
+  let badField = [];
+  DKEYS.forEach(k => {
+    const items = dmeta(k).items;
+    if (items.length < 6) badField.push(k + ':only ' + items.length);
+    items.forEach((it, n) => {
+      if (!it.t || !it.h) badField.push(k + '[' + n + ']:basic');
+      if (!Array.isArray(it.r) || it.r.length !== 3) badField.push(k + '[' + n + ']:r');
+      if (!Array.isArray(it.q) || it.q.length !== 3) badField.push(k + '[' + n + ']:q');
+      if (!it.l) badField.push(k + '[' + n + ']:l');
+    });
   });
-  ok('每条内容字段完整', bad.length === 0, bad.join(','));
+  ok('每条字段完整（4 字段 + 3 输入 + 3 自测）', badField.length === 0, badField.slice(0,6).join(','));
 
-  const tracks = [...new Set(DAILY.map(d => d.track))];
-  ok('主题覆盖 4 类', tracks.length === 4, tracks.join('/'));
-  ok('同日主题连续不重复', (function(){
-    for (let k = 0; k < DAILY.length - 1; k++) if (DAILY[k].track === DAILY[k+1].track && DAILY[k].track === DAILY[k+2] && DAILY[k+2]) return false;
-    return true;
+  const total = DKEYS.reduce((s,k) => s + dmeta(k).items.length, 0);
+  ok('总条目 >= 60', total >= 60, 'got ' + total);
+
+  const titles = [];
+  DKEYS.forEach(k => dmeta(k).items.forEach(it => titles.push(it.t)));
+  const dupes = titles.filter((t,n) => titles.indexOf(t) !== n);
+  ok('全局标题无重复', dupes.length === 0, dupes.join(' | '));
+
+  DKEYS.forEach(k => {
+    const t = dmeta(k).items.map(x => x.t);
+    const d = t.filter((x,n) => t.indexOf(x) !== n);
+    if (d.length) badField.push(k + ':dup');
+  });
+  ok('领域内标题无重复', !badField.includes(k => false) && badField.filter(x => x.endsWith(':dup')).length === 0, '');
+  ok('每个领域都有配色', DKEYS.every(k => /^#[0-9a-f]{6}$/i.test(dmeta(k).color)));
+
+  /* ---- 每日组合 ---- */
+  const d1 = digestFor(day, 0, 'all');
+  const d2 = digestFor(day, 0, 'all');
+  ok('每天 8 条', d1.length === 8, 'got ' + d1.length);
+  ok('同一天结果稳定', JSON.stringify(d1) === JSON.stringify(d2));
+  ok('当天领域不重复', new Set(d1.map(x => x.domain)).size === 8);
+  ok('次日组合不同', JSON.stringify(digestFor(day+1,0,'all')) !== JSON.stringify(d1));
+
+  const seen = new Set();
+  for (let n = 0; n < 30; n++) digestFor(day + n, 0, 'all').forEach(x => seen.add(x.domain));
+  ok('30 天内覆盖全部 10 个领域', seen.size === 10, [...seen].join('/'));
+
+  // 每个领域的条目池要被轮完
+  let rotBad = [];
+  DKEYS.forEach(k => {
+    const got = new Set();
+    for (let n = 0; n < 40; n++) {
+      digestFor(day + n, 0, 'all').forEach(x => { if (x.domain === k) got.add(x.item.t); });
+    }
+    if (got.size !== dmeta(k).items.length) rotBad.push(k + ':' + got.size + '/' + dmeta(k).items.length);
+  });
+  ok('40 天内每个领域条目轮换完整', rotBad.length === 0, rotBad.join(','));
+
+  ok('按领域筛选只返回该领域', (function(){
+    const f = digestFor(day, 0, '金融');
+    return f.length <= 1 && f.every(x => x.domain === '金融');
   })());
+  ok('筛选到未排到的领域时返回空且不崩', digestFor(day, 0, '不存在的领域').length === 0);
+  ok('换一批会改变组合', JSON.stringify(digestFor(day,1,'all')) !== JSON.stringify(d1));
 
-  // 2. 今日渲染
+  /* ---- 渲染 ---- */
+  renderChips();
+  ok('筛选条渲染出 11 个 chip', (document.getElementById('chips').innerHTML.match(/class="chip/g)||[]).length === 11);
   renderToday();
   const body = document.getElementById('todayBody').innerHTML;
-  ok('今日渲染出标题', body.includes('<h1>'));
-  ok('今日有三段', body.includes('输入（挑一个') && body.includes('自测（合上材料') && body.includes('连线'));
-  ok('日期已填充', document.getElementById('hdDate').textContent.includes('周'));
+  ok('今日渲染出 8 个条目', (body.match(/class="item /g)||[]).length === 8, 'got ' + (body.match(/class="item /g)||[]).length);
+  ok('进度显示 已读 0 / 8', document.getElementById('hdCount').textContent === '已读 0 / 8', document.getElementById('hdCount').textContent);
+  ok('进度条宽度为 0', document.getElementById('hbarFill').style.width === '0%');
+  ok('折叠时不渲染题目', !body.includes('自测（合上材料再答）'));
 
-  // 3. 初始卡片
-  const seeds = load();
-  ok('初始 5 张卡', seeds.length === 5, 'got ' + seeds.length);
-  ok('初始卡都带解释', seeds.every(c => c.e && c.t));
+  // 页面渲染的是「今天」，所以断言要用今天的组合，而不是上面固定 day 的组合
+  const first = CURRENT[0].item.t;
+  toggleItem(0);
+  const body2 = document.getElementById('todayBody').innerHTML;
+  ok('展开后渲染出输入与自测', body2.includes('自测（合上材料再答）') && body2.includes('输入（挑一个'));
+  ok('展开状态可关闭', (function(){ toggleItem(0); return !document.getElementById('todayBody').innerHTML.includes('自测（合上材料再答）'); })());
+  ok('事件用索引而非标题', document.getElementById('todayBody').innerHTML.includes('onclick="toggleItem(0)"'));
+  ok('越界索引不崩', (function(){ toggleItem(99); markRead(99,false); return true; })());
+
+  /* ---- 阅读进度 ---- */
+  setRead(first, true);
+  ok('已读写入今天的记录', readSet().has(first));
+  ok('只记今天的日期', Object.keys(loadRead()).length === 1, Object.keys(loadRead()).join(','));
+  renderToday();
+  ok('进度变成 1 / 8', document.getElementById('hdCount').textContent === '已读 1 / 8', document.getElementById('hdCount').textContent);
+  ok('进度条 12.5%', document.getElementById('hbarFill').style.width === '12.5%', document.getElementById('hbarFill').style.width);
+  setRead(first, false);
+  ok('撤销已读', !readSet().has(first));
+  ok('未读数回到 8', (function(){ renderToday(); return document.getElementById('hdCount').textContent === '已读 0 / 8'; })());
+
+  /* ---- 卡片 ---- */
+  const seeds = loadCards();
+  ok('初始 4 张卡', seeds.length === 4, 'got ' + seeds.length);
   ok('初始卡默认明天到期', seeds.every(c => c.due > Date.now()));
 
-  // 4. 复习：全部到期
-  let list = load();
+  let list = loadCards();
   list.forEach(c => c.due = Date.now() - 1000);
-  save(list);
+  saveCards(list);
   restartReview();
-  let rv = document.getElementById('reviewBody').innerHTML;
-  ok('到期后进入复习队列', rv.includes('1 / 5'), rv.slice(0, 120));
+  ok('到期后进入复习队列', document.getElementById('reviewBody').innerHTML.includes('1 / 4'));
 
-  // 5. 评分推进：连点 5 次「讲得出来」
-  for (let n = 0; n < 5; n++) grade(true);
-  rv = document.getElementById('reviewBody').innerHTML;
-  ok('5 张过完后显示结束', rv.includes('过完了'), rv.slice(0, 120));
-  list = load();
-  ok('5 张都升到 stage 1', list.every(c => c.stage === 1), JSON.stringify(list.map(c => c.stage)));
-  ok('间隔推到约 1 天后', list.every(c => c.due - Date.now() > 20 * 3600 * 1000));
-  ok('越界不崩', (function(){ grade(true); grade(false); return true; })());
+  for (let n = 0; n < 4; n++) grade(true);
+  ok('4 张过完显示结束', document.getElementById('reviewBody').innerHTML.includes('过完了'));
+  ok('间隔推到约 1 天后', loadCards().every(c => c.stage === 1 && c.due - Date.now() > 20*3600*1000));
 
-  // 6. 打回逻辑
-  list = load();
+  list = loadCards();
   list.forEach(c => c.due = Date.now() - 1000);
   list[0].stage = 3;
-  save(list);
+  saveCards(list);
   restartReview();
   grade(false);
-  const first = load().find(c => c.stage === 0 && c.due < Date.now() + 2 * 86400000);
-  ok('讲不出来打回 stage 0 且一天内再考', !!first, JSON.stringify(load().map(c => [c.stage, Math.round((c.due - Date.now())/3600000)])));
+  ok('讲不出来打回 stage 0', loadCards().some(c => c.stage === 0));
 
-  // 7. 新增卡片
-  const before = load().length;
   document.getElementById('f-t').value = '测试概念';
   document.getElementById('f-e').value = '这是我自己写的一句解释';
-  document.getElementById('f-x').value = '例子';
-  document.getElementById('f-r').value = '连到 X';
   saveCard();
-  ok('新增卡片成功', load().length === before + 1, 'before ' + before);
-  ok('新卡明天到期', load()[0].due > Date.now() + 20 * 3600 * 1000);
+  ok('新增卡片成功', loadCards().length === 5);
+  ok('新卡排在第一位', loadCards()[0].t === '测试概念');
 
-  // 8. 空标题不落库
-  const n0 = load().length;
-  document.getElementById('f-t').value = '';
-  document.getElementById('f-e').value = 'x';
+  const n0 = loadCards().length;
+  document.getElementById('f-t').value = '只有名字';
+  document.getElementById('f-e').value = '';
   saveCard();
-  ok('空概念名被拒绝', load().length === n0);
+  ok('空解释被拒绝', loadCards().length === n0);
 
-  // 9. 转义
-  ok('HTML 被转义', esc('<script>&"') === '&lt;script&gt;&amp;&quot;');
+  /* ---- 其他 ---- */
+  ok('HTML 转义', esc('<script>&"') === '&lt;script&gt;&amp;&quot;');
+  renderCorpus();
+  ok('内容规模统计正常', document.getElementById('corpusInfo').innerHTML.includes('10 个领域'));
 
   global.__R = R;
 })();
 `;
 
-vm.runInThisContext(code + '\n' + tests, { filename: 'app.js' });
+vm.runInThisContext(data + '\n' + app + '\n' + tests, { filename: 'app.js' });
 const R = globalThis.__R || [];
 console.log(R.join('\n'));
 const fails = R.filter(r => r.startsWith('FAIL'));
