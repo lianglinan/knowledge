@@ -126,6 +126,7 @@ const tests = `
   toggleItem(0);
   const body2 = document.getElementById('todayBody').innerHTML;
   ok('展开后渲染出输入与自测', body2.includes('自测（合上材料再答）') && body2.includes('输入（挑一个'));
+  ok('输入方向带复制入口', body2.includes('copyDir(0,0)') && body2.includes('class="ci"'));
   ok('展开状态可关闭', (function(){ toggleItem(0); return !document.getElementById('todayBody').innerHTML.includes('自测（合上材料再答）'); })());
   ok('事件用索引而非标题', document.getElementById('todayBody').innerHTML.includes('onclick="toggleItem(0)"'));
   ok('越界索引不崩', (function(){ toggleItem(99); markRead(99,false); return true; })());

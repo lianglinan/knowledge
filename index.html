@@ -70,9 +70,11 @@
   }
   .sec-t::after{content:"";flex:1;height:1px;background:var(--line)}
   ul.reads{margin:0;padding:0;list-style:none}
-  ul.reads li{font-size:14.5px;color:#d5dee8;padding:7px 0 7px 14px;position:relative;border-bottom:1px solid rgba(42,50,61,.5)}
+  ul.reads li{font-size:14.5px;color:#d5dee8;padding:7px 40px 7px 14px;position:relative;border-bottom:1px solid rgba(42,50,61,.5);cursor:pointer}
+  ul.reads li:active{background:rgba(77,163,255,.08)}
   ul.reads li:last-child{border-bottom:0}
   ul.reads li::before{content:"›";position:absolute;left:2px;color:var(--dim)}
+  ul.reads li .ci{position:absolute;right:0;top:50%;transform:translateY(-50%);font-size:11px;color:var(--accent);opacity:.7;letter-spacing:.04em}
   ol.quiz{margin:0;padding-left:18px}
   ol.quiz li{font-size:14.5px;color:#d5dee8;margin-bottom:7px}
   .link-note{
@@ -455,8 +457,8 @@ function renderToday(){
       </div>
       ${open ? `<div class="item-bd">
         <div class="sec">
-          <div class="sec-t">输入（挑一个，读完再动笔）</div>
-          <ul class="reads">${item.r.map(x=>`<li>${esc(x)}</li>`).join('')}</ul>
+          <div class="sec-t">输入（挑一个，点一下可复制）</div>
+          <ul class="reads">${item.r.map((x,i)=>`<li onclick="event.stopPropagation();copyDir(${idx},${i})">${esc(x)}<span class="ci">复制</span></li>`).join('')}</ul>
         </div>
         <div class="sec">
           <div class="sec-t">自测（合上材料再答）</div>
@@ -500,6 +502,44 @@ function markRead(idx, currentlyRead){
   setRead(cur.item.t, !currentlyRead);
   renderToday();
   if(!currentlyRead) toast('记下了');
+}
+
+/* 输入方向是可点的：点一下复制，拿去搜索或粘到自己的笔记里。
+   https 下用 navigator.clipboard，http（局域网）下退回到 execCommand。 */
+function copyDir(idx, i){
+  const cur = CURRENT[idx];
+  if(!cur) return;
+  const text = cur.item.r[i];
+  if(!text){ return; }
+
+  if(typeof navigator !== 'undefined' && navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(
+      function(){ toast('已复制，去搜或粘贴到笔记'); },
+      function(){ fallbackCopy(text); }
+    );
+    return;
+  }
+  fallbackCopy(text);
+}
+
+function fallbackCopy(text){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '0';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast(ok ? '已复制，去搜或粘贴到笔记' : '复制失败，可长按文字手动复制');
+  }catch(e){
+    toast('复制失败，可长按文字手动复制');
+  }
 }
 
 function spinToday(){
